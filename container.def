@@ -1,0 +1,144 @@
+Bootstrap: docker
+From: ubuntu:{{ UBUNTU_VER}}
+
+%arguments
+UBUNTU_VER=22.04
+ANTS_VER=2.5.4
+
+%environment
+# export templateloc=/usr/share/afni/atlases
+export ANTSPATH="/opt/ants-{{ ANTS_VER }}/bin"
+export ANTSSCRIPTS="/opt/ants-{{ ANTS_VER }}/Scripts"
+
+export DEBIAN_FRONTEND=noninteractive
+export TZ=Europe/Brussels
+
+export PATH="/usr/bin:$PATH:$ANTSPATH:$ANTSSCRIPTS"
+
+%post
+# Set install variables, create tmp folder
+export TMPDIR="/tmp/general_preproc_build_$( date -u +"%F_%H-%M-%S" )"
+[[ -d ${TMPDIR} ]] && rm -rf ${TMPDIR}
+mkdir -p ${TMPDIR}
+export DEBIAN_FRONTEND=noninteractive
+export TZ=Europe/Brussels
+apt update -qq
+apt install -y -q --no-install-recommends ca-certificates dirmngr gnupg lsb-release
+
+# Install PYTHON things, as well as git and curl.
+apt update -qq
+apt install -y -q --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    git-annex \
+    python3.10 \
+    python3.10-dev \
+    python3-distutils \
+    python3-pip \
+    python3-rpy2 \
+    python-is-python3
+
+pip3 install pip==25.1.1 setuptools==80.7.1 wheel==0.45.1
+
+# Install datalad, nilearn, peakdet, phys2cvr.
+pip3 install \
+    matplotlib \
+    numpy \
+    pandas \
+    seaborn \
+    statsmodels \
+    scipy \
+    nigsp[nifti]
+
+# Prepare repos and install dependencies
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C9A7585B49D51698710F3A115E25F516B04C661B
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6E12762B81063D17BDDD3142F142A4D99F16EB04
+echo "deb https://ppa.launchpadcontent.net/marutter/rrutter4.0/ubuntu $(lsb_release -cs) main" | tee -a /etc/apt/sources.list
+echo "deb-src https://ppa.launchpadcontent.net/marutter/rrutter4.0/ubuntu $(lsb_release -cs) main" | tee -a /etc/apt/sources.list
+echo "deb https://ppa.launchpadcontent.net/c2d4u.team/c2d4u4.0+/ubuntu $(lsb_release -cs) main" | tee -a /etc/apt/sources.list
+echo "deb-src https://ppa.launchpadcontent.net/c2d4u.team/c2d4u4.0+/ubuntu $(lsb_release -cs) main" | tee -a /etc/apt/sources.list
+apt update -qq
+apt install -y -q --no-install-recommends \
+    bc \
+    bzip2 \
+    cmake \
+    csvtool \
+    dc \
+    file \
+    freeglut3-dev \
+    g++ \
+    gcc \
+    less \
+    libcurl4-openssl-dev \
+    libeigen3-dev \
+    libexpat1-dev \
+    libf2c2-dev \
+    libfftw3-3 \
+    libfftw3-dev \
+    libgdal-dev \
+    libgfortran-11-dev \
+    libglew-dev \
+    libgl1-mesa-dev \
+    libgl1-mesa-dri \
+    libgl1-mesa-glx \
+    libglib2.0-dev \
+    libglu1-mesa-dev \
+    libglw1-mesa \
+    libgomp1 \
+    libgsl-dev \
+    libgts-dev \
+    libjpeg8-dev \
+    liblapack3 \
+    libopenblas-dev \
+    libmotif-dev \
+    libnetpbm10-dev \
+    libnode-dev \
+    libpng16-16 \
+    libpng-dev \
+    libquadmath0 \
+    libqt5opengl5-dev \
+    libqt5svg5-dev \
+    libtiff5 \
+    libtiff5-dev \
+    libudunits2-dev \
+    libxext-dev \
+    libxi-dev \
+    libxm4 \
+    libxmhtml-dev \
+    libxml2-dev \
+    libxmu-dev \
+    libxmu-headers \
+    libxpm-dev \
+    libxt-dev \
+    m4 \
+    make \
+    mesa-common-dev \
+    nano \
+    rsync \
+    tcsh \
+    qhull-bin \
+    xvfb \
+    zlib1g-dev
+    # libgfortran4 \
+
+# Install Imagemagick
+apt install -y -q imagemagick
+
+# Install ANTs
+mkdir -p ${TMPDIR}/ants/build
+git clone -b v{{ ANTS_VER }} --depth=1 https://github.com/ANTsX/ANTs.git ${TMPDIR}/ants/source
+cd ${TMPDIR}/ants/build || exit 1
+cmake -DCMAKE_INSTALL_PREFIX=/opt/ants-{{ ANTS_VER }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF ${TMPDIR}/ants/source
+make -j 10
+mkdir -p /opt/ants-{{ ANTS_VER }}
+cd ANTS-build || exit 1
+make install
+mv ../../source/Scripts/ /opt/ants-{{ ANTS_VER }}
+cd ${TMPDIR} || exit 1
+rm -rf ${TMPDIR}/ants
+
+# Final removal of lists and cleanup
+cd /tmp || exit 1
+rm -rf ${TMPDIR}
+rm -rf /var/lib/apt/lists/*
