@@ -145,6 +145,9 @@ if __name__ == "__main__":
     run_ols(ROI_table, "ROI")
     run_ols(parcel_table, "parcel")
 
+    run_oml(ROI_table, "ROI")
+    run_oml(parcel_table, "parcel")
+
     plot_ols(ROI_table, "/data/derivatives/Anastasija/vessel_density_ROI.png")
     plot_ols(parcel_table, "/data/derivatives/Anastasija/vessel_density_parcels.png")
 
