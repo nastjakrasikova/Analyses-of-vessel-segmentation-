@@ -15,7 +15,6 @@ def run_vascular_analysis():
     atlas_nii = nib.load("Schaefer2018_LocalGlobal_Parcellation_MNI152_1mm.nii.gz")
     atlas_data = atlas_nii.get_fdata()
 
-
 # align for the same matrix space 
 assert vessel_mask.shape == atlas_data.shape
 # region of interests and their labels 
