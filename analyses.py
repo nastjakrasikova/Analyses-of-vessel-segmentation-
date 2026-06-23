@@ -31,7 +31,11 @@ roi_labels = {
 def apply_atlas(atlas, vessels, labels):
     mask  = np.isin(atlas, list(labels))
     total = mask.sum()
-    return ((mask) & (vessels == 1)).sum() / total if total > 0 else 0.0
+    density = 0
+    if total > 0:
+        density = vessels[vessels!=0][mask].sum() / total
+    
+    return density
 
 
 def calculate_regional_density(vessel_path, parcel_path):
