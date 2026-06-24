@@ -10,7 +10,7 @@ do
 	T1w2T2starw_linear=/data/derivatives/vessels/sub-${sub}/ses-7T/reg/sub-${sub}_ses-02_UNIT12vesselref0GenericAffine.mat
 
 	antsApplyTransforms -d 3 -i /scripts/Schaefer2018_1000Parcels_17Networks_order_FSLMNI152_1mm.nii.gz \
-						-r ${anat_reference}.nii.gz \
+						-r ${anat_reference} \
 						-o /data/derivatives/Anastasija/sub-${sub}_Schaefer.nii.gz \
 						-n MultiLabel \
 						-t ${T1w2T2starw_linear} \
