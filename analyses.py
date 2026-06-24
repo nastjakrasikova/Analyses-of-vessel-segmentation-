@@ -102,9 +102,15 @@ def plot_ols(df, figname):
 if __name__ == "__main__":
 
     roi_labels = {
-        "Precuneus": list(range(389, 411)),              # Labels 389–410
-        "Parahippocampal_Gyrus": list(range(479, 485)),  # Labels 479–484
-        "Superior_Frontal_Gyrus": list(range(921, 926))  # Labels 921–925
+      'Precuneus': get_ids(range(359, 372), range(389, 411), range(896, 907), range(926, 938)),
+    'Parahippocampal_Gyrus': get_ids(range(479, 485), range(975, 979)),
+    'Superior_Frontal_Gyrus': get_ids(
+        range(253, 260), range(269, 273), range(316, 332), range(346, 359), 
+        range(385, 389), range(411, 423), range(445, 468), range(775, 783), 
+        range(792, 797), range(843, 855), range(874, 896), range(921, 926), 
+        range(938, 948), range(955, 969)
+    ),
+    'Visual_Cortex': get_ids(range(1, 35), range(501, 540))
     }
 
     # CRITICAL STEP: Define the true structural hierarchy of your categories
