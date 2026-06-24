@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
     # CRITICAL STEP: Define the true structural hierarchy of your categories
     # (Replace this list with your actual preferred ordering)
-    parcel_hierarchy = ["", "", "", ""]
+   parcel_hierarchy = ["Parahippocampal_Gyrus", "Precuneus", "Superior_Frontal_Gyrus", "Visual_Cortex"]
 
     ROI_rows = []
     parcel_rows = []
